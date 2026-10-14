@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Seating Optimizer | SeatSmart</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<header>
+    <div class="logo">🪑 SeatSmart</div>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="/guests">Guests</a>
+        <a href="/setup">Setup</a>
+    </nav>
+</header>
+
+<div class="container">
+
+    <h1>⚡ Optimize Seating</h1>
+
+    <p style="margin: 15px 0 25px; color: #667085;">
+        Generate a seating plan using the Backtracking algorithm.
+    </p>
+
+    {% if error %}
+        <div style="background:#fee2e2; color:#991b1b;
+                    padding:15px; border-radius:8px;
+                    margin-bottom:20px;">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <div style="background:#f4f7fb; padding:20px;
+                border-radius:10px; margin-bottom:25px;">
+
+        <h3>Event Information</h3>
+
+        <p style="margin-top:10px;">
+            Total Guests: <strong>{{ guests|length }}</strong>
+        </p>
+
+        <p style="margin-top:10px;">
+            Available Seats: <strong>{{ settings.get('seats', 0) }}</strong>
+        </p>
+
+        <p style="margin-top:10px;">
+            Seats Per Row: <strong>{{ settings.get('row_seats', 0) }}</strong>
+        </p>
+
+        <p style="margin-top:10px;">
+            Arrangement: <strong>{{ settings.get('arrangement', '-') }}</strong>
+        </p>
+    </div>
+
+    <h2>Guest List</h2>
+
+    {% if guests %}
+        <table style="width:100%; margin-top:15px;
+                      border-collapse:collapse;">
+            <tr style="background:#eef0ff;">
+                <th style="padding:10px;">Guest</th>
+                <th style="padding:10px;">Group</th>
+                <th style="padding:10px;">Preferred</th>
+                <th style="padding:10px;">Avoid</th>
+            </tr>
+
+            {% for guest in guests %}
+            <tr>
+                <td style="padding:10px; text-align:center;">
+                    {{ guest.name }}
+                </td>
+                <td style="padding:10px; text-align:center;">
+                    {{ guest.group }}
+                </td>
+                <td style="padding:10px; text-align:center;">
+                    {{ guest.preferred or '-' }}
+                </td>
+                <td style="padding:10px; text-align:center;">
+                    {{ guest.avoid or '-' }}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p style="margin-top:15px;">No guests added yet.</p>
+    {% endif %}
+
+    <form method="POST" style="margin-top:30px;">
+        <button type="submit">
+            🚀 Run Backtracking Optimization
+        </button>
+    </form>
+
+    {% if seating %}
+        <div style="margin-top:40px;">
+            <h2>✅ Final Seating Plan</h2>
+
+            <p style="margin:10px 0 20px; color:#667085;">
+                The algorithm found a valid arrangement.
+            </p>
+
+            <div style="display:grid;
+                        grid-template-columns:repeat(
+                            {{ settings.get('row_seats', 2) }},
+                            minmax(0, 1fr));
+                        gap:12px;">
+
+                {% for item in seating %}
+                    {% if item.guest %}
+                    <div style="background:#e4f7e9;
+                                border:1px solid #86c99a;
+                                border-radius:10px;
+                                padding:18px 8px;
+                                text-align:center;">
+
+                        <strong>Seat {{ item.seat_number }}</strong>
+
+                        <p style="margin-top:8px;">
+                            {{ item.guest.name }}
+                        </p>
+
+                        <small>{{ item.guest.group }}</small>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+
+            </div>
+        </div>
+    {% endif %}
+
+    <div style="margin-top:30px;">
+        <a href="/guests" class="btn">← Back to Guests</a>
+        <a href="/setup" class="btn">Edit Setup</a>
+    </div>
+
+</div>
+
+<footer>
+    Event Seating Optimizer | M.Tech Project
+</footer>
+
+</body>
+</html>
